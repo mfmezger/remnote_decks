@@ -92,8 +92,6 @@
 - Why are classifier guardrails insufficient on their own against prompt injection? == They are probabilistic and can be evaded by adaptive attackers; a small miss rate is unacceptable when the downstream action is high-impact.
 - What is an allow-list guardrail? == Permitting only explicitly approved actions, tools, domains, or output formats and rejecting everything else, which is more robust than block-listing bad inputs.
 - What role does sandboxing play in LLM security? == Running model-generated code and tool actions in isolated environments with restricted filesystem, network, and credentials limits the blast radius of a compromise.
-- What is human-in-the-loop as a guardrail? == Requiring explicit user confirmation before consequential actions such as sending email, making payments, or deleting data.
-- What is a weakness of human-in-the-loop approval? == Approval fatigue: users rubber-stamp frequent prompts, and confirmation dialogs can be crafted to hide what the action actually does.
 - What does least privilege mean for LLM tools? == Grant each tool and agent the minimum scopes needed, use the end user's own credentials, and avoid broad service accounts.
 - What is the dual-LLM pattern? == A privileged LLM with tool access never sees untrusted content; a quarantined LLM without tools processes untrusted data, returning results only as opaque variables.
 - What is the key idea of CaMeL-style designs? == A privileged LLM turns the trusted user request into a program; untrusted data is parsed by a quarantined LLM; an interpreter tracks data provenance and enforces security policies on tool calls.
@@ -115,8 +113,6 @@
 - What is LLM red teaming? == Adversarially probing a model or application, manually or with automated attackers, to discover harmful outputs, jailbreaks, and exploitable behaviors before attackers do.
 - What is attack success rate (ASR)? == Number of successful attacks / number of attack attempts, usually judged by a classifier or human against the targeted harmful behavior.
 - Why report a safety classifier's TPR at a fixed FPR? == Deployments tolerate only a small false-positive rate on benign traffic, so detection rate at that operating point is more relevant than AUC or accuracy.
-- How is TPR defined for a jailbreak classifier? == TP / (TP + FN), the share of actual attacks correctly flagged.
-- How is FPR defined for a jailbreak classifier? == FP / (FP + TN), the share of benign prompts wrongly flagged.
 - What is over-refusal? == A model or guardrail refusing safe requests because they superficially resemble harmful ones, e.g. "how do I kill a Python process".
 - What does XSTest measure? == Exaggerated safety: whether models wrongly refuse safe prompts that contain trigger words or resemble unsafe ones, alongside contrasting unsafe prompts.
 - What is HarmBench? == A standardized evaluation framework for automated red teaming that measures attack success rates of many attack methods against many models across harmful behaviors.

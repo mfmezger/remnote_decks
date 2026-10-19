@@ -41,8 +41,6 @@
 
 - What are structured outputs? == A feature that makes model output conform to a supplied JSON Schema, guaranteeing parseable, schema-valid responses.
 - How does JSON mode differ from schema-enforced structured outputs? == JSON mode only guarantees syntactically valid JSON; structured outputs additionally guarantee conformance to a specific schema.
-- What is constrained decoding? == At each generation step, masking out tokens that would violate a grammar or schema so only valid continuations can be sampled.
-- How is a JSON Schema typically enforced during constrained decoding? == It is compiled into a grammar or finite-state machine that tracks which next tokens are valid and masks the logits of all others.
 - What is a known quality risk of constrained decoding, and a common mitigation? == Forcing a rigid format can degrade reasoning; place a reasoning field before answer fields so the answer, generated left to right, can condition on it.
 - Do structured outputs guarantee correct values? == No; they guarantee format validity only, so values can still be wrong or hallucinated and semantic validation is still needed.
 
@@ -78,7 +76,6 @@
 - Why treat the context window as a budget? == Every token competes for finite capacity and attention; low-value content raises cost and latency and can degrade performance.
 - What is compaction in agents? == Summarizing or pruning a long conversation history as it nears the context limit, then continuing with the condensed version.
 - What is a risk of aggressive compaction? == Losing details that later matter; good compaction keeps decisions, open issues, and key facts while dropping redundant raw tool output.
-- What is "lost in the middle"? == The finding (Liu et al., 2023) that LLMs use information at the beginning and end of long contexts better than information in the middle.
 - What is context rot? == Degradation in a model's ability to accurately recall and use information as context length grows, even well within the nominal window.
 - What is just-in-time context retrieval? == Keeping lightweight references such as file paths, queries, or IDs and letting the agent load data via tools when needed, instead of pre-loading everything.
 - What is structured note-taking in long-running agent tasks? == The agent writes persistent notes, such as a progress or TODO file, outside the context and re-reads them, preserving state across compactions.
@@ -106,22 +103,13 @@
 - What is agent looping? == Repeating the same or similar actions without progress, often due to unclear feedback; mitigated with step limits and repetition detection.
 - What is tool hallucination? == The model calls nonexistent tools, invents arguments, or fabricates tool results instead of actually calling the tool.
 - Why do errors compound over long horizons? == If each step succeeds with probability p, success over n dependent steps is roughly p to the power n, so small per-step error rates cause large end-to-end failure.
-- What is reward hacking in agents? == Optimizing the measurable proxy instead of the intended goal, e.g., special-casing or deleting tests to make them pass.
-- What is prompt injection in agentic contexts? == Malicious instructions in tool results, web pages, or files that the agent follows as commands, potentially causing harmful actions or data exfiltration.
-- What is the "lethal trifecta" for agent data exfiltration? == Simon Willison's term for combining access to private data, exposure to untrusted content, and the ability to communicate externally.
+- How does reward hacking typically show up in coding agents? == The agent satisfies the visible check instead of the real goal, e.g., special-casing or deleting tests so they pass.
 - What is premature task completion? == The agent declares success without verifying, e.g., claiming tests pass without running them; mitigated by requiring verification evidence.
 
 ## Agent Evaluation
 
 - What is task success rate in agent evaluation? == The fraction of tasks whose final outcome meets the success criterion, typically checked by tests, environment state checks, or graders.
-- What is trajectory evaluation? == Assessing the sequence of steps, tool calls, and reasoning an agent took, not just its final answer, to judge efficiency, correctness, and safety.
-- What is a pitfall of strict trajectory matching? == Agents can reach correct results via many valid paths, so rigid matching against a reference trajectory penalizes legitimate alternatives.
-- What does pass@k measure? == The probability that at least one of k independent attempts succeeds, capturing capability when retries are allowed.
-- What does pass^k measure? == The probability that all k independent attempts succeed, capturing reliability and consistency; it was introduced with the tau-bench benchmark.
-- How do pass@k and pass^k behave as k grows? == pass@k rises toward 1 while pass^k falls, exposing inconsistency that single-trial success rates hide.
 - If per-trial success is p and trials are independent, what is pass^k? == p to the power k; e.g., 80% per-trial success gives about 51% pass^3.
-- Why track cost and latency per task in agent evals? == Agents vary widely in tokens, tool calls, and wall time; an accurate but slow or expensive agent may be unusable, so report them alongside success.
-- What is LLM-as-judge in agent evaluation? == Using a model with a rubric to grade outputs or trajectories where programmatic checks are impractical; it should be validated against human labels.
 - Why must agent eval environments be reset between trials? == Leftover state lets trials influence each other, producing correlated and misleading results.
 
 ## Sandboxing and Permissions
@@ -129,7 +117,6 @@
 - Why run coding agents in a sandbox? == To contain the impact of mistakes or prompt-injected actions by limiting filesystem, network, and process access to a bounded environment.
 - What are the two key isolation dimensions for coding-agent sandboxes? == Filesystem isolation (restrict reads and writes to allowed directories) and network isolation (restrict outbound connections to approved hosts).
 - Why is network isolation important even when the filesystem is restricted? == Without it, a compromised agent can exfiltrate secrets or source code, or download malicious payloads.
-- What is the principle of least privilege for agents? == Grant only the minimum tools, credentials, and permissions the task needs, scoped narrowly and ideally time-limited.
 - What are common permission modes for coding agents? == Read-only or plan mode, ask-before-acting approval, auto-approve within an allowlist, and fully autonomous mode inside an isolated sandbox.
 - Why prefer allowlists over denylists for agent commands? == Denylists are easily bypassed via equivalent commands or obfuscation, while allowlists permit only known-safe operations.
 - What technologies commonly provide sandboxes for coding agents? == Containers, microVMs such as Firecracker, or OS-level sandboxing such as macOS Seatbelt or Linux bubblewrap and seccomp.

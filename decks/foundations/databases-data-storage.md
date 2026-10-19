@@ -87,7 +87,6 @@
 - What is normalization? == Organizing relational data to reduce avoidable duplication and update anomalies, often by separating facts according to their dependencies.
 - What is denormalization? == Deliberately storing redundant or precombined data to improve some reads, at the cost of storage and more complex consistency maintenance.
 - What is an update anomaly? == Duplicated facts become inconsistent because only some copies are changed, such as conflicting customer addresses in separate order rows.
-- What is a database migration? == A versioned change to the schema or data used to evolve a database alongside the application.
 - Why should large data backfills often run in bounded batches? == They can otherwise hold resources for too long, overload the database, or make failure recovery difficult.
 - What is a soft delete? == Marking a record as deleted without immediately removing it physically, which requires queries and retention policies to handle that state correctly.
 - Why is soft deletion not necessarily sufficient for a privacy deletion request? == The data may remain in tables, indexes, replicas, logs, or backups; deletion requirements must cover applicable storage and retention behavior.

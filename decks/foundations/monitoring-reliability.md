@@ -52,10 +52,12 @@
 - What is a service level objective (SLO)? == A target for an SLI over a defined period, such as 99.9% successful requests over 30 days.
 - What is a service level agreement (SLA)? == An agreement defining service commitments and consequences for missing them, such as contractual service credits.
 - SLI versus SLO versus SLA? == The SLI is the measurement, the SLO is the target, and the SLA is the agreement with consequences.
+- Why is an SLO usually stricter than the corresponding SLA? == It leaves a safety margin, so the team is alerted and can react before contractual consequences apply.
 - What is an error budget? == The amount of unreliability allowed by an SLO; a 99.9% good-event target permits 0.1% bad events over the measurement window.
 - What is an error-budget policy? == An agreed response to budget consumption, such as slowing risky releases or prioritizing reliability improvements.
 - How much downtime does 99.9% time-based availability allow over exactly 30 days? == 43.2 minutes, because 0.001 × 30 × 24 × 60 = 43.2; request-based SLOs do not translate directly into downtime.
 - What is an error-budget burn rate? == The observed bad-event rate divided by the allowed bad-event rate; a value of 10 consumes budget ten times as fast as the sustainable rate at the same traffic level.
+- What is multi-window burn-rate alerting? == Alerting only when the burn rate is high over both a long window (e.g. 1 h) and a short one (e.g. 5 min): the long window ignores blips, the short one lets the alert clear soon after recovery.
 - Why define reliability targets around user journeys? == Infrastructure health alone can miss failures in the tasks users actually need to complete.
 
 ## Alerts and On-Call Work
@@ -91,7 +93,6 @@
 - What is graceful degradation? == Continuing to provide reduced but useful functionality when part of the system fails.
 - What is a recovery time objective (RTO)? == The target maximum time to restore a service after a disruption.
 - What is a recovery point objective (RPO)? == The target maximum amount of data loss expressed as time, such as losing at most the last 15 minutes of writes.
-- Why are backup restoration drills important? == A backup is useful only if it can actually be restored correctly within acceptable time and data-loss limits.
 - What is a synthetic check? == An automated simulated user action run periodically to test a defined service path from a known location or environment.
 - Synthetic monitoring versus real-user monitoring? == Synthetic checks use controlled test traffic; real-user monitoring observes actual user experiences, which are broader but less controlled.
 - What is chaos engineering? == Controlled experiments that introduce failures to test resilience, with a clear hypothesis, limited impact, monitoring, and stop conditions.

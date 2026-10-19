@@ -13,16 +13,13 @@
 - Why is causal masking needed in decoder LMs? == It prevents leakage from future tokens, so training on all positions in parallel matches left-to-right autoregressive generation at inference.
 - What is the difference between self-attention and cross-attention? == In self-attention Q, K, V come from the same sequence; in cross-attention queries come from one sequence (e.g., decoder) and keys/values from another (e.g., encoder output).
 - Where is cross-attention used in the original encoder-decoder Transformer? == In each decoder block: decoder states form the queries, attending over the encoder's final outputs as keys and values.
-- What is the complexity of standard attention in sequence length n? == O(n^2) time and memory, because every token is scored against every other token, producing an n x n score matrix per head.
+- What is the complexity of standard attention in sequence length n? == O(n^2) time and memory, because every token is scored against every other token, producing an n × n score matrix per head.
 - Is unmasked self-attention sensitive to token order on its own? == No; without positional information it is permutation-equivariant (shuffling inputs just shuffles outputs), so order must be injected explicitly.
-- What is FlashAttention? == An exact, IO-aware attention kernel that tiles computation in fast on-chip SRAM and never materializes the n x n matrix, making memory linear in n while compute stays O(n^2).
 
 ## Multi-Head Attention, MQA & GQA
 
 - What is multi-head attention? == Running h attention operations in parallel on separate learned projections (head dim typically d_model / h), concatenating their outputs, and applying an output projection W_O.
 - Why use multiple attention heads instead of one? == Different heads can attend to different positions and relation types in different subspaces simultaneously, at roughly the cost of one full-width head.
-- What is the KV cache? == Stored keys and values of previous tokens during autoregressive decoding, so each new token computes only its own Q, K, V instead of reprocessing the prefix.
-- How does KV cache memory scale? == Proportional to 2 (K and V) x layers x KV heads x head_dim x sequence length x batch size x bytes per element.
 - What is Multi-Query Attention (MQA)? == All query heads share a single key head and a single value head, drastically shrinking the KV cache and memory bandwidth during decoding.
 - What is Grouped-Query Attention (GQA)? == Query heads are split into groups that each share one K/V head; it interpolates between multi-head (groups = heads) and multi-query (one group).
 - Why do many modern LLMs (e.g., Llama 2 70B, Llama 3) use GQA? == It cuts KV cache size and decode bandwidth almost as much as MQA while keeping quality close to full multi-head attention.
@@ -39,7 +36,7 @@
 ## The Transformer Block
 
 - What are the two main sublayers of a transformer block? == Multi-head self-attention, which mixes information across positions, and a position-wise feed-forward network (MLP), which transforms each token independently.
-- What does the classic transformer FFN look like? == Two linear layers with a nonlinearity between them, expanding d_model to a hidden size (classically 4 x d_model) and projecting back.
+- What does the classic transformer FFN look like? == Two linear layers with a nonlinearity between them, expanding d_model to a hidden size (classically 4 × d_model) and projecting back.
 - What is a residual connection in a transformer block? == Adding a sublayer's input to its output, x + f(x), which eases gradient flow through deep stacks.
 - What is the residual stream? == The per-token hidden vector running through the network that each attention and MLP sublayer reads from and adds its output to.
 - What does LayerNorm compute? == Per token, it subtracts the mean and divides by the standard deviation across features, then applies a learned scale and bias.
@@ -49,7 +46,7 @@
 - Why do pre-norm models apply a final norm after the last block? == The residual stream itself is never normalized inside the blocks, so it is normalized once before the LM head.
 - What is GELU? == Gaussian Error Linear Unit: GELU(x) = x · Phi(x), where Phi is the standard normal CDF; a smooth ReLU-like activation used in BERT and GPT-2.
 - What is SwiGLU? == A gated FFN: (Swish(x W1) elementwise-multiplied by (x W3)) W2, with Swish(z) = z · sigmoid(z); used in PaLM and Llama.
-- Why is the SwiGLU hidden size often about 8/3 x d_model instead of 4 x d_model? == SwiGLU uses three weight matrices instead of two, so the hidden size is shrunk to keep parameters and compute roughly equal to a standard 4x FFN.
+- Why is the SwiGLU hidden size often about 8/3 × d_model instead of 4 × d_model? == SwiGLU uses three weight matrices instead of two, so the hidden size is shrunk to keep parameters and compute roughly equal to a standard 4x FFN.
 
 ## Positional Information
 
@@ -72,15 +69,14 @@
 - Why do token counts differ across languages for the same content? == Vocabularies are fitted to training data dominated by some languages (often English), so underrepresented languages and scripts split into more tokens, raising cost and shrinking effective context.
 - Why do LLMs often struggle with arithmetic and spelling tasks? == Tokenization chunks numbers and words into inconsistent multi-character pieces, so the model doesn't directly see individual digits or letters.
 - How have tokenizers mitigated digit quirks? == By splitting numbers into single digits (e.g., Llama 1/2, PaLM) or groups of at most three digits (e.g., GPT-4's cl100k), giving more consistent number representations.
-- What is the token embedding matrix? == A learned lookup table of shape vocab_size x d_model mapping each token ID to the dense vector fed into the first block.
+- What is the token embedding matrix? == A learned lookup table of shape vocab_size × d_model mapping each token ID to the dense vector fed into the first block.
 - What is the LM head? == The final linear layer projecting each position's last hidden state (size d_model) to vocab_size scores used for next-token prediction.
 - What are logits in an LLM? == The unnormalized per-vocabulary scores output by the LM head; softmax turns them into a next-token probability distribution.
-- What are tied input/output embeddings? == Reusing the token embedding matrix (transposed) as the LM head weights, saving vocab_size x d_model parameters; common in smaller models.
+- What are tied input/output embeddings? == Reusing the token embedding matrix (transposed) as the LM head weights, saving vocab_size × d_model parameters; common in smaller models.
 
 ## Training Objective
 
 - What is the next-token prediction objective? == Maximize the likelihood of each token given all preceding tokens, i.e., minimize the cross-entropy loss -log p(true next token), with p from softmax over logits, averaged over all predicted positions.
-- How does perplexity relate to cross-entropy loss? == Perplexity = exp(mean cross-entropy in nats); lower perplexity means the model is less surprised by the data.
 - What is teacher forcing? == Feeding ground-truth previous tokens as inputs during training rather than the model's own predictions, which enables parallel training over all positions.
 - What is exposure bias? == The train-inference mismatch caused by teacher forcing: at inference the model conditions on its own possibly erroneous outputs, which it never saw in training.
 - Why can a decoder-only model compute the loss for every position in one forward pass? == Causal masking makes each position's prediction depend only on earlier tokens, so all n next-token predictions are valid simultaneously.
@@ -121,10 +117,10 @@
 ## Model Sizing & Efficient Alternatives
 
 - What is the approximate parameter count of a dense transformer? == About 12 · n_layers · d_model^2, excluding embeddings, assuming standard multi-head attention and a 4x FFN.
-- Where does the 12 · d_model^2 per-layer estimate come from? == Attention has Q, K, V, O projections (4 · d^2) and the FFN has two d x 4d matrices (8 · d^2); biases and norms are negligible.
+- Where does the 12 · d_model^2 per-layer estimate come from? == Attention has Q, K, V, O projections (4 · d^2) and the FFN has two d × 4d matrices (8 · d^2); biases and norms are negligible.
 - How well does 12 · L · d^2 match GPT-3? == With 96 layers and d_model = 12288 it gives about 174B, close to the reported 175B parameters.
 - What is sliding-window attention? == Each token attends only to the previous W tokens, reducing cost from O(n^2) to O(n · W) (e.g., Mistral 7B with W = 4096).
-- How can stacked sliding-window layers use context beyond the window? == Each layer extends the receptive field by up to W tokens, so after L layers information can flow from roughly L x W tokens back.
+- How can stacked sliding-window layers use context beyond the window? == Each layer extends the receptive field by up to W tokens, so after L layers information can flow from roughly L × W tokens back.
 - What inference benefit does sliding-window attention give? == The KV cache can be a fixed-size rolling buffer of W entries, bounding memory regardless of sequence length.
 - What are state space models (SSMs) in the LLM context? == Sequence models using a linear recurrence over a fixed-size hidden state, giving linear time in sequence length and constant memory during generation (no KV cache that grows with context).
 - What is Mamba's key innovation over earlier SSMs? == Selective state spaces: SSM parameters depend on the input, letting the model choose what to keep or forget, computed with a hardware-aware parallel scan.

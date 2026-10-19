@@ -8,8 +8,6 @@ English-language flashcards for software engineering, statistics, and AI. Each M
 - [`decks/statistics/`](decks/statistics/): statistical reasoning, product experiments, and ML evaluation metrics.
 - [`decks/ai/`](decks/ai/): LLM internals, applications, evaluation, and operations.
 
-The original root-level decks now live in these folders with their filenames and contents preserved. `metrics.md` is in `decks/statistics/`; the other original decks are in `decks/ai/`.
-
 ## Deck Index
 
 ### Software Engineering Foundations
@@ -17,11 +15,11 @@ The original root-level decks now live in these folders with their filenames and
 | Deck | Topics | Cards |
 | --- | --- | ---: |
 | [Software Testing & QA](decks/foundations/software-testing-qa.md) | Smoke and regression tests, test levels, mocks, coverage, performance testing | 71 |
-| [Deployment & Releases](decks/foundations/deployment-releases.md) | CI/CD, environments, canaries, blue-green deployments, feature flags, rollback | 68 |
-| [Monitoring & Reliability](decks/foundations/monitoring-reliability.md) | Logs, metrics, traces, SLI/SLO/SLA, alerts, incidents, recovery | 75 |
+| [Deployment & Releases](decks/foundations/deployment-releases.md) | CI/CD, environments, canaries, blue-green deployments, feature flags, rollback | 67 |
+| [Monitoring & Reliability](decks/foundations/monitoring-reliability.md) | Logs, metrics, traces, SLI/SLO/SLA, alerts, incidents, recovery | 76 |
 | [APIs & Web Fundamentals](decks/foundations/apis-web-fundamentals.md) | HTTP, JSON, status codes, REST, authentication, OAuth, webhooks, idempotency | 77 |
-| [Software Architecture & Distributed Systems](decks/foundations/software-architecture-distributed-systems.md) | Monoliths, services, queues, caching, scaling, retries, distributed state | 75 |
-| [Databases & Data Storage](decks/foundations/databases-data-storage.md) | SQL/NoSQL, joins, indexes, ACID, isolation, migrations, replication, backups | 81 |
+| [Software Architecture & Distributed Systems](decks/foundations/software-architecture-distributed-systems.md) | Monoliths, services, queues, caching, scaling, retries, distributed state | 74 |
+| [Databases & Data Storage](decks/foundations/databases-data-storage.md) | SQL/NoSQL, joins, indexes, ACID, isolation, migrations, replication, backups | 80 |
 | [Git & Collaboration](decks/foundations/git-collaboration.md) | Commits, branches, pull requests, merge/rebase, conflicts, revert/reset | 81 |
 
 ### Statistics and Experiments
@@ -30,7 +28,7 @@ The original root-level decks now live in these folders with their filenames and
 | --- | --- | ---: |
 | [Statistics & Experiment Design](decks/statistics/statistics-experiment-design.md) | Probability, confidence intervals, hypothesis tests, power, bootstrap, causality | 87 |
 | [A/B Testing & Product Experiments](decks/statistics/ab-testing-experiments.md) | Assignment, metrics, instrumentation, duration, SRM, analysis, ship decisions | 66 |
-| [ML Evaluation Metrics](decks/statistics/metrics.md) | Classification, regression, ranking, generative models, evaluation methodology | 114 |
+| [ML Evaluation Metrics](decks/statistics/metrics.md) | Classification, regression, ranking, generative models, evaluation methodology | 109 |
 
 **Scope:** Statistics & Experiment Design teaches the methods and their interpretation. A/B Testing & Product Experiments applies those ideas to running trustworthy product experiments. ML Evaluation Metrics focuses on measuring model performance.
 
@@ -38,14 +36,14 @@ The original root-level decks now live in these folders with their filenames and
 
 | Deck | Topics | Cards |
 | --- | --- | ---: |
-| [Transformer & LLM Internals](decks/ai/transformer-internals.md) | Attention, architectures, tokenization, training objectives, scaling | 97 |
-| [Retrieval-Augmented Generation](decks/ai/rag.md) | Chunking, embeddings, retrieval, reranking, grounding, evaluation | 98 |
-| [Agents & Tool Use](decks/ai/agents-tool-use.md) | Planning, tool calling, structured outputs, MCP, memory, permissions | 99 |
-| [Fine-Tuning & Alignment](decks/ai/fine-tuning-alignment.md) | SFT, LoRA/QLoRA, preference learning, RLHF, reasoning | 98 |
-| [LLM Inference & Serving](decks/ai/inference-serving.md) | KV cache, batching, quantization, parallelism, latency, cost | 99 |
-| [LLM Evals](decks/ai/llm-evals.md) | Evaluation datasets, judges, benchmarks, regression checks | 98 |
-| [LLMOps & Observability](decks/ai/llmops-observability.md) | OpenTelemetry, tracing, production metrics, prompt management | 99 |
-| [LLM Security](decks/ai/llm-security.md) | Prompt injection, leakage, poisoning, guardrails, red teaming | 95 |
+| [Transformer & LLM Internals](decks/ai/transformer-internals.md) | Attention, architectures, tokenization, training objectives, scaling | 93 |
+| [Retrieval-Augmented Generation](decks/ai/rag.md) | Chunking, embeddings, retrieval, reranking, grounding, evaluation | 93 |
+| [Agents & Tool Use](decks/ai/agents-tool-use.md) | Planning, tool calling, structured outputs, MCP, memory, permissions | 86 |
+| [Fine-Tuning & Alignment](decks/ai/fine-tuning-alignment.md) | SFT, LoRA/QLoRA, preference learning, RLHF, reasoning | 97 |
+| [LLM Inference & Serving](decks/ai/inference-serving.md) | KV cache, batching, quantization, parallelism, latency, cost | 89 |
+| [LLM Evals](decks/ai/llm-evals.md) | Evaluation datasets, judges, benchmarks, regression checks | 90 |
+| [LLMOps & Observability](decks/ai/llmops-observability.md) | OpenTelemetry, tracing, production metrics, prompt management | 81 |
+| [LLM Security](decks/ai/llm-security.md) | Prompt injection, leakage, poisoning, guardrails, red teaming | 91 |
 
 ## Suggested Starting Points
 
@@ -53,7 +51,7 @@ The original root-level decks now live in these folders with their filenames and
 - **Understanding experiments:** Statistics & Experiment Design → A/B Testing & Product Experiments.
 - **Measuring AI systems:** ML Evaluation Metrics → LLM Evals, then the relevant application deck.
 
-You can study decks independently. Some foundational concepts intentionally recur where a different practical context makes them useful.
+You can study decks independently. Each concept has one home deck; other decks only add cards that look at it from a different angle (for example, GQA is defined in Transformer & LLM Internals, while LLM Inference & Serving asks why it speeds up decoding).
 
 ## Using the Decks in RemNote
 
@@ -82,7 +80,10 @@ RemNote recognizes `==` or `>>` as the separator for a basic forward flashcard. 
 - Prefer one learning target per card; include comparison and application questions as well as definitions.
 - State important assumptions and limitations rather than teaching misleading absolutes.
 - Keep cards understandable without relying on their order in a study session.
+- Before adding a card, search the other decks; don't repeat a question that already has a home deck.
+- Use `×` for multiplication, never the letter `x`.
 - Update the index and card count when adding or changing a deck.
+- Run `python3 scripts/check_decks.py` to check card format, duplicate questions across decks, and the README card counts.
 
 ## Selected References
 
