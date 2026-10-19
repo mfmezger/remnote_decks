@@ -3,7 +3,6 @@
 ## Why RAG vs Fine-Tuning vs Long Context
 
 - What core problem does RAG solve for LLMs? == It grounds generation in retrieved external documents, giving the model access to private or fresh knowledge and reducing hallucination without retraining.
-- When is fine-tuning preferable to RAG? == When you need to change model behavior, style, output format, or task skill; fine-tuning is unreliable for injecting frequently changing factual knowledge.
 - Why prefer RAG over fine-tuning for knowledge that changes often? == Updating knowledge only requires re-indexing documents rather than retraining, and answers can cite their sources.
 - What are the main downsides of putting an entire corpus into a long context window instead of retrieving? == Higher cost and latency per query, a hard cap on corpus size, and weaker use of relevant facts buried in very long inputs.
 - When can long context reasonably replace RAG? == When the relevant material is small enough to fit in the window and the per-query cost and latency of processing it all are acceptable.
@@ -128,14 +127,10 @@
 
 ## RAG Evaluation
 
-- What is recall@k? == The fraction of a query's relevant documents that appear in the top k retrieved results.
-- What is MRR (Mean Reciprocal Rank)? == The mean over queries of 1 / rank of the first relevant result (0 if none is retrieved), rewarding a relevant item near the top.
-- What is NDCG? == Normalized Discounted Cumulative Gain: graded relevance discounted by log2(rank + 1), summed, and divided by the ideal ordering's DCG, giving a position-sensitive 0 to 1 score.
 - Why is recall@k the key metric for first-stage retrieval? == The reranker and generator can only use what was retrieved, so the first stage should maximize recall and leave precision to later stages.
 - What is faithfulness in RAG evaluation? == The degree to which every claim in the answer is supported by the retrieved context; low faithfulness signals hallucination even if the answer happens to be correct.
 - What is answer relevancy? == How directly and completely the answer addresses the question, independent of whether its claims are factually correct.
 - What is context precision? == Whether the retrieved chunks are relevant to the question, and (in RAGAS) whether relevant chunks are ranked above irrelevant ones.
 - What is context recall? == Whether the retrieved context contains all the information needed to produce the reference answer, judged against a ground-truth answer.
-- What is a golden dataset for RAG? == A curated set of representative questions with reference answers and/or relevant document IDs, including edge cases and unanswerable questions, used as a fixed regression benchmark.
-- What is the main caveat of LLM-as-judge evaluation? == Judges have biases such as position, verbosity, and self-preference, so their scores must be validated against human labels before being trusted.
+- What should a RAG golden dataset contain beyond questions and reference answers? == Relevant document IDs, so retrieval can be scored separately, plus edge cases and unanswerable questions to test abstention.
 - Why evaluate retrieval and generation separately? == To attribute failures to the right stage, since improving the generator cannot fix a retrieval miss.

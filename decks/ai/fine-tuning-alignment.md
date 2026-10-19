@@ -10,7 +10,6 @@
 ## Fine-Tune vs Prompt vs RAG
 
 - When should you prefer prompting over fine-tuning? == When the task can be specified with instructions and a few examples; prompting is cheapest, fastest to iterate, and should be the baseline.
-- When is RAG the right tool? == When the model needs large, changing, or private knowledge with citations; retrieval injects facts at inference time without retraining.
 - When is fine-tuning the right tool? == To consistently change behavior, style, format, or task skill, to shorten prompts and cut latency, or to distill a large model into a smaller, cheaper one.
 - Why is fine-tuning a poor way to add new factual knowledge? == Models absorb new facts slowly and unreliably through fine-tuning and it can increase hallucination; RAG is more reliable and easier to update.
 
@@ -29,7 +28,7 @@
 - What is full fine-tuning? == Updating all model parameters; it is the most expressive option but needs the most memory and a full model copy per task.
 - What is parameter-efficient fine-tuning (PEFT)? == Training only a small set of new or selected parameters while freezing the base model, cutting memory, storage, and compute.
 - How many bytes per parameter does full fine-tuning with Adam in mixed precision need? == Roughly 16 bytes: 2 for bf16 weights, 2 for bf16 gradients, 4 for fp32 master weights, and 8 for the two fp32 Adam moment estimates, excluding activations.
-- Approximately how much memory does full fine-tuning of a 7B model with Adam need? == About 7B x 16 bytes, roughly 112 GB before activations, so it requires multiple GPUs, sharding (e.g., ZeRO/FSDP), or offloading.
+- Approximately how much memory does full fine-tuning of a 7B model with Adam need? == About 7B × 16 bytes, roughly 112 GB before activations, so it requires multiple GPUs, sharding (e.g., ZeRO/FSDP), or offloading.
 - Why keep fp32 master weights in mixed-precision training? == Small updates can be lost to bf16/fp16 rounding; an fp32 master copy accumulates updates accurately.
 - What does gradient checkpointing trade off? == It saves activation memory by recomputing activations during the backward pass, at the cost of extra compute (roughly one additional forward pass).
 - What does gradient accumulation do? == It sums gradients over several micro-batches before each optimizer step, simulating a larger effective batch size without extra memory.
@@ -37,12 +36,12 @@
 ## LoRA
 
 - What is the core idea of LoRA? == Freeze the pretrained weight W and learn a low-rank update delta W = BA, so the effective weight becomes W + BA.
-- For a weight W of shape d x k, what are the shapes of the LoRA matrices? == B is d x r and A is r x k with rank r much smaller than min(d, k), giving r(d + k) trainable parameters instead of dk.
+- For a weight W of shape d × k, what are the shapes of the LoRA matrices? == B is d × r and A is r × k with rank r much smaller than min(d, k), giving r(d + k) trainable parameters instead of dk.
 - How are LoRA matrices initialized? == A gets a random initialization and B is set to zeros, so BA = 0 and training starts exactly from the base model.
 - What does the LoRA rank r control? == The capacity of the update: higher r means more trainable parameters and expressiveness; typical values range from about 4 to 64.
-- What is LoRA alpha? == A scaling hyperparameter: the update is applied as W + (alpha / r) x BA, which reduces the need to retune the learning rate when changing r.
+- What is LoRA alpha? == A scaling hyperparameter: the update is applied as W + (alpha / r) × BA, which reduces the need to retune the learning rate when changing r.
 - Which modules does LoRA typically target? == The original paper adapted only attention projections (mainly q and v); applying it to all linear layers, including the MLP, usually gives better quality.
-- What does merging a LoRA adapter mean? == Computing W' = W + (alpha / r) x BA once and replacing W, yielding a standard model with no extra modules.
+- What does merging a LoRA adapter mean? == Computing W' = W + (alpha / r) × BA once and replacing W, yielding a standard model with no extra modules.
 - Does a merged LoRA model add inference latency? == No; after merging, the architecture and FLOPs are identical to the base model.
 - What is the benefit of keeping LoRA adapters unmerged? == Many small task adapters can share one base model and be hot-swapped or batched per request (multi-LoRA serving).
 - Why does LoRA reduce training memory so much? == Gradients and optimizer states are kept only for the tiny adapter parameters; the frozen base needs just its weights plus activations.
@@ -86,7 +85,7 @@
 - What is the Bradley-Terry model for preferences? == P(chosen preferred over rejected) = sigmoid(r(x, y_w) - r(x, y_l)), so the probability depends only on the reward difference.
 - What is the reward model training loss? == Minimize -log sigmoid(r(x, y_w) - r(x, y_l)) over preference pairs, pushing chosen rewards above rejected ones.
 - What is the typical reward model architecture? == Usually the SFT model with the language-model head replaced by a scalar head that outputs one reward per (prompt, response).
-- What objective does the RL stage of RLHF maximize? == E[r(x, y)] - beta x KL(pi || pi_ref): expected reward minus a penalty for drifting from the reference (SFT) policy.
+- What objective does the RL stage of RLHF maximize? == E[r(x, y)] - beta × KL(pi || pi_ref): expected reward minus a penalty for drifting from the reference (SFT) policy.
 - What is the reference model in RLHF? == A frozen copy of the SFT model used to compute the KL penalty that keeps the policy from drifting.
 - Which models are involved in PPO-based RLHF? == Four: the trainable policy, the frozen reference model, the reward model, and the value (critic) model.
 - What does PPO's clipping do? == It clips the probability ratio between new and old policies to [1 - eps, 1 + eps], preventing overly large policy updates.
@@ -98,8 +97,8 @@
 ## DPO and Variants
 
 - What is DPO? == Direct Preference Optimization trains the policy directly on preference pairs with a classification-style loss, skipping the explicit reward model and RL loop.
-- What is the key insight behind DPO? == The KL-constrained RLHF objective has a closed-form optimal policy, so the reward is implicitly beta x log(pi(y|x) / pi_ref(y|x)) plus a prompt-only term.
-- What is the DPO loss? == -log sigmoid(beta x [log(pi(y_w|x) / pi_ref(y_w|x)) - log(pi(y_l|x) / pi_ref(y_l|x))]), raising the chosen log-ratio relative to the rejected one.
+- What is the key insight behind DPO? == The KL-constrained RLHF objective has a closed-form optimal policy, so the reward is implicitly beta × log(pi(y|x) / pi_ref(y|x)) plus a prompt-only term.
+- What is the DPO loss? == -log sigmoid(beta × [log(pi(y_w|x) / pi_ref(y_w|x)) - log(pi(y_l|x) / pi_ref(y_l|x))]), raising the chosen log-ratio relative to the rejected one.
 - What role does the reference model play in DPO? == The frozen SFT model anchors the log-ratios, acting as the implicit KL constraint that keeps the policy from drifting arbitrarily.
 - What does beta control in DPO? == How strongly the policy is held to the reference: higher beta keeps it closer; values around 0.1 are common.
 - What are DPO's advantages over PPO-based RLHF? == It is simpler, more stable, and cheaper: no reward model, value model, or online sampling, just supervised-style training on offline pairs.

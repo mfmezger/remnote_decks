@@ -40,7 +40,6 @@
 
 - How do you validate an LLM judge? == Have humans label a sample of outputs, run the judge on the same items, and measure agreement before trusting the judge's scores.
 - Why is raw percent agreement misleading for judge validation? == With imbalanced labels, a judge that always says "pass" can show high agreement while catching no failures.
-- What is Cohen's kappa? == Agreement between two raters corrected for chance: kappa = (p_o - p_e) / (1 - p_e), where p_o is observed and p_e is chance-expected agreement.
 - What is a judge's true positive rate (TPR), treating pass as the positive class? == Among outputs humans labeled pass, the fraction the judge also labels pass.
 - What is a judge's true negative rate (TNR), treating pass as the positive class? == Among outputs humans labeled fail, the fraction the judge also labels fail; it measures how well the judge catches real failures.
 - Why report judge TPR and TNR separately rather than accuracy? == They expose asymmetric errors; a judge that misses failures (low TNR) inflates pass rates even when overall accuracy looks good.
@@ -81,7 +80,7 @@
 - What does MT-Bench measure? == Multi-turn conversational and instruction-following quality on 80 questions across 8 categories, graded by a strong LLM judge on a 1-10 scale.
 - What does IFEval measure? == Instruction following on prompts with verifiable constraints (e.g., word counts, required keywords, no commas) that are checked programmatically.
 - What does BFCL measure? == Function-calling accuracy, including choosing the right function, producing correct arguments, parallel and multiple calls, and recognizing when no function is relevant.
-- What does tau-bench measure? == Agent reliability in tool-using customer-service tasks with an LLM-simulated user and domain policies, scored by comparing the final database state to the goal state.
+- What does tau-bench measure? == Agent reliability in tool-using customer-service tasks with an LLM-simulated user and domain policies, scored by comparing the final database state to the goal state; it also introduced the pass^k metric.
 - What does ARC-AGI measure? == Fluid abstraction and skill acquisition: inferring a transformation rule from a few input-output grid examples and applying it to a new grid.
 - What does Humanity's Last Exam measure? == Frontier expert-level knowledge and reasoning on difficult, partly multimodal questions written by subject experts across many fields, designed to resist saturation.
 
@@ -97,7 +96,6 @@
 
 ## Variance, Power, and Prompt Sensitivity
 
-- Why is temperature 0 not fully deterministic for LLM APIs? == Batching, non-associative floating-point arithmetic in GPU kernels, and mixture-of-experts routing can change outputs across calls.
 - How should eval runs handle sampling randomness? == Run each item several times, report mean and standard error, and fix seeds and decoding settings where possible.
 - Why are paired comparisons preferred when comparing two models? == Scoring both on the same items removes item-difficulty variance, so the per-item difference has lower variance and detects smaller effects.
 - What is the approximate per-group sample size to detect a pass-rate difference? == n ≈ (z_alpha/2 + z_beta)^2 * (p1(1 - p1) + p2(1 - p2)) / (p1 - p2)^2, about 7.85 times the variance sum over the squared difference at alpha 0.05 and 80% power.
@@ -107,9 +105,6 @@
 
 ## Evaluating RAG and Agents
 
-- Why evaluate retrieval and generation separately in RAG? == It localizes failures: a wrong answer may come from missing context (retrieval) or from ignoring or misusing correct context (generation).
-- What does faithfulness (groundedness) measure in RAG eval? == The fraction of claims in the answer that are supported by the retrieved context, capturing hallucination relative to sources.
-- What does context recall measure in RAG eval? == Whether the retrieved context contains the information needed for the reference answer; it requires ground-truth answers or relevant passages.
 - What is the RAG triad? == Context relevance (query vs retrieved context), groundedness (answer vs context), and answer relevance (answer vs query).
 - What is outcome-based agent evaluation? == Judging only whether the final result or end state is correct, e.g., tests pass or a database matches the goal, regardless of path.
 - What is trajectory-based agent evaluation? == Judging the sequence of steps, such as tool choices, arguments, and ordering, against expectations or rubrics.
@@ -117,13 +112,10 @@
 - What does pass^k measure for agents? == The probability that all k independent trials of a task succeed, estimated per task as C(c, k) / C(n, k), measuring reliability rather than best-case ability.
 - How does pass^k differ in behavior from pass@k as k grows? == pass@k rises with k because one success suffices, while pass^k falls with k, exposing inconsistency.
 
-## CI Regression and Online Evaluation
+## CI Gates and Cost
 
 - How are LLM evals typically structured in CI? == Fast deterministic assertions run on every change, larger model-graded suites run on a sample or nightly, and results are compared against a baseline.
 - Why should CI eval gates use tolerances instead of exact score matching? == Eval scores are noisy, so gates should flag drops beyond expected run-to-run variance to avoid flaky failures.
-- What is an online eval in production? == Running assertions or LLM judges asynchronously on sampled live traffic to monitor quality and detect drift or new failure modes.
-- What implicit feedback signals are used to evaluate LLM features online? == Behaviors like accepting, copying, editing, regenerating, or abandoning outputs, which are more abundant than explicit thumbs ratings.
-- What is a guardrail metric in an A/B test? == A metric that must not degrade significantly, such as latency, cost, error rate, or safety violations, even if the primary metric improves.
 - Why are cost and latency first-class eval dimensions? == A more accurate configuration may be unusable if it is too slow or expensive, so choices should be made on the quality-cost-latency Pareto frontier.
 - Why compare cost per successful task rather than cost per call? == A cheaper model that fails more often or needs retries and extra steps can be more expensive per completed outcome.
 

@@ -16,11 +16,10 @@
 
 - What does the KV cache store? == The key and value vectors of every past token at every layer and KV head, so they are not recomputed at each decode step.
 - Why are queries not cached during decoding? == Only the current token's query is needed at each step; past queries are never reused.
-- What is the formula for KV cache size? == 2 x layers x kv_heads x head_dim x seq_len x bytes_per_element x batch, where the factor 2 accounts for keys and values.
+- What is the formula for KV cache size? == 2 × layers × kv_heads × head_dim × seq_len × bytes_per_element × batch, where the factor 2 accounts for keys and values.
 - How does KV cache memory scale with context length and batch size? == Linearly in both, so long contexts and large batches are often limited by KV cache memory rather than by weights.
-- What is the KV cache per token for 32 layers, 8 KV heads, head_dim 128, FP16? == 2 x 32 x 8 x 128 x 2 bytes = 131,072 bytes, i.e. 128 KiB per token.
-- What is Multi-Query Attention (MQA)? == All query heads share a single key/value head, shrinking the KV cache by a factor equal to the number of query heads, at some quality risk.
-- What is Grouped-Query Attention (GQA)? == Query heads are split into groups that each share one KV head, cutting KV cache by num_query_heads / num_kv_heads with quality close to full multi-head attention.
+- What is the KV cache per token for 32 layers, 8 KV heads, head_dim 128, FP16? == 2 × 32 × 8 × 128 × 2 bytes = 131,072 bytes, i.e. 128 KiB per token.
+- By what factor does GQA shrink the KV cache compared with multi-head attention? == num_query_heads / num_kv_heads; e.g. 32 query heads sharing 8 KV heads give a 4× smaller cache.
 - Why do GQA and MQA also speed up decode, not just save memory? == Less KV data is read from memory per decode step, easing the memory-bandwidth bottleneck of attention.
 
 ## Memory Management & Batching
@@ -55,7 +54,7 @@
 ## FlashAttention
 
 - What is FlashAttention's core idea? == An IO-aware exact attention kernel that minimizes reads and writes between GPU HBM and on-chip SRAM via tiling and kernel fusion.
-- How does FlashAttention avoid materializing the N x N attention matrix? == It processes Q, K, V tiles in SRAM and uses online softmax (running max and sum) to accumulate outputs without writing the score matrix to HBM.
+- How does FlashAttention avoid materializing the N × N attention matrix? == It processes Q, K, V tiles in SRAM and uses online softmax (running max and sum) to accumulate outputs without writing the score matrix to HBM.
 - Is FlashAttention an approximation of attention? == No, it computes exact attention; the speedup comes from less memory traffic, not fewer FLOPs.
 - How do FlashAttention's memory and compute scale with sequence length? == Extra memory is linear in sequence length instead of quadratic, while compute stays quadratic.
 - What does Flash-Decoding add for inference? == It splits the KV cache along the sequence dimension into chunks processed in parallel and then reduced, keeping the GPU busy during decode with small batches and long contexts.
@@ -89,7 +88,7 @@
 
 - What is TTFT? == Time to first token: from request arrival to the first output token, dominated by queueing and prefill; it drives perceived responsiveness.
 - What are TPOT and ITL? == Time per output token (average decode time per token) and inter-token latency (each gap between consecutive streamed tokens).
-- How is end-to-end latency approximated from TTFT and TPOT? == E2E latency is approximately TTFT + TPOT x (output_tokens - 1).
+- How is end-to-end latency approximated from TTFT and TPOT? == E2E latency is approximately TTFT + TPOT × (output_tokens - 1).
 - What is throughput in LLM serving? == Total tokens (often output tokens) generated per second across all concurrent requests on a deployment.
 - What is goodput? == The throughput of requests that meet their latency SLOs (e.g. TTFT and TPOT targets), measuring useful served load rather than raw tokens per second.
 - What is the latency-throughput trade-off of batch size? == Larger batches raise aggregate throughput and cost efficiency but increase per-request TPOT and queueing, until compute or KV cache memory saturates.
@@ -97,21 +96,14 @@
 
 ## Memory Estimates & MoE
 
-- How do you estimate model weight memory? == params x bytes_per_param, with 4 bytes for FP32, 2 for FP16/BF16, 1 for INT8/FP8, 0.5 for INT4 (plus small scale overhead).
+- How do you estimate model weight memory? == params × bytes_per_param, with 4 bytes for FP32, 2 for FP16/BF16, 1 for INT8/FP8, 0.5 for INT4 (plus small scale overhead).
 - How much memory do 70B parameters need in FP16 vs INT4? == About 140 GB in FP16 and about 35 GB in INT4, before KV cache and runtime overhead.
 - What makes up total GPU memory when serving an LLM? == Weights + KV cache + activations/workspace + framework overhead; memory left after weights sets KV capacity and thus max batch and context.
-- What is the difference between total and active parameters in an MoE model? == Total counts all experts and determines memory; active counts shared layers plus the top-k routed experts used per token and determines FLOPs per token.
 - Why do MoE models need large batches for efficient inference? == At small batch each expert sees few tokens per weight load, so arithmetic intensity is low; larger batches give each loaded expert more tokens.
 
 ## Sampling
 
-- What is greedy decoding? == Always choosing the highest-probability token; deterministic but prone to repetition and bland output.
-- What does temperature do in sampling? == It divides logits by T before softmax: T below 1 sharpens the distribution, T above 1 flattens it, and T near 0 approaches greedy.
-- What is top-k sampling? == Sampling only from the k most probable tokens after renormalizing their probabilities.
-- What is top-p (nucleus) sampling? == Sampling from the smallest set of tokens whose cumulative probability reaches p, so the candidate set adapts to model confidence.
-- What is min-p sampling? == Keeping only tokens whose probability is at least min_p times the top token's probability, a cutoff that scales with model confidence.
 - How do repetition, presence, and frequency penalties differ? == Repetition penalty rescales logits of previously seen tokens; presence penalty subtracts a constant once a token appeared; frequency penalty subtracts in proportion to its count.
-- What is beam search and when is it used? == Keeping the top-b partial sequences by cumulative log-probability each step; useful for short, well-defined outputs like translation, rarely for open-ended chat.
 - Why can temperature-0 output differ between runs on a serving engine? == Changing batch composition and non-associative floating-point reductions alter logits slightly, which can flip near-tied argmax choices.
 
 ## Structured Output
@@ -119,7 +111,6 @@
 - What is constrained decoding? == At each step, masking the logits of tokens that would violate a grammar or schema so only valid continuations can be sampled (e.g. Outlines, XGrammar, llama.cpp grammars).
 - How are regexes and JSON schemas enforced during decoding? == They are compiled into a finite-state machine or a grammar automaton (pushdown for CFGs), and the current state determines the allowed-token mask.
 - Why is aligning tokens with a grammar non-trivial? == Tokens span multiple characters and do not align with grammar symbols, so engines precompute or cache which vocabulary tokens are valid from each automaton state.
-- What does constrained decoding guarantee and not guarantee? == It guarantees syntactic validity, not semantic correctness, and overly restrictive constraints can degrade output quality.
 
 ## Serving Engines
 
@@ -132,7 +123,6 @@
 
 ## Cost Levers
 
-- How should prompts be structured to benefit from provider prompt caching? == Put static content (system prompt, tool definitions, documents) first and variable content last, so the cached prefix matches and is billed at a discount.
 - What do batch APIs trade for lower price? == Latency: requests are processed asynchronously with results returned within a longer window, suiting offline evals and bulk processing.
 - Why consider smaller or distilled models for cost? == The smallest model meeting quality targets is far cheaper per token, and fine-tuning or distillation can close the gap on narrow tasks.
 - What is model routing (or cascading)? == Sending easy requests to cheap models and escalating hard ones to larger models, cutting average cost while preserving quality.

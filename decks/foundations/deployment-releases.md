@@ -55,7 +55,6 @@
 - What is a trade-off of blue-green deployment? == It can enable a fast traffic switch and fallback but requires extra capacity and careful handling of shared state and data changes.
 - What is a canary release? == Expose a new version to a limited portion of traffic or users, evaluate it, and expand exposure or roll back.
 - What should be monitored during a canary? == Relevant error rates, latency, resource use, and business or correctness signals, compared with a suitable baseline.
-- Why is a canary not automatically an A/B test? == Its traffic may not be randomized or representative, and its purpose and analysis often focus on operational safety rather than causal effect estimation.
 - What is a shadow deployment? == Send copies of real requests to a candidate version while the established version continues producing user-visible responses.
 - Why must shadow traffic be isolated from side effects? == Duplicate requests could otherwise charge users, send messages, or modify production data a second time.
 - Why do shadow results not fully predict real-user outcomes? == Users do not act on the shadow responses, so downstream behavior and feedback effects are absent.

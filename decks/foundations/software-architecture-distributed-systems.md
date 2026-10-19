@@ -82,7 +82,6 @@
 ## Distributed State and Coordination
 
 - What is replication? == Maintaining copies of data or state on multiple nodes for availability, durability, or read scaling, depending on the design.
-- What is sharding? == Dividing data across nodes by a partitioning rule, so different nodes own different subsets.
 - Replication versus sharding? == Replication copies the same data; sharding divides different data across nodes. A system can use both.
 - What is eventual consistency? == If updates stop and communication continues, replicas eventually converge; reads before convergence may return older or different values.
 - What is linearizability? == A consistency guarantee under which each operation appears to take effect atomically between its invocation and response, respecting real-time order.
