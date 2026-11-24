@@ -16,7 +16,7 @@ English-language flashcards for software engineering, statistics, and AI. Each M
 | --- | --- | ---: |
 | [Software Testing & QA](decks/foundations/software-testing-qa.md) | Smoke and regression tests, test levels, mocks, coverage, performance testing | 71 |
 | [Deployment & Releases](decks/foundations/deployment-releases.md) | CI/CD, environments, canaries, blue-green deployments, feature flags, rollback | 67 |
-| [Monitoring & Reliability](decks/foundations/monitoring-reliability.md) | Logs, metrics, traces, SLI/SLO/SLA, alerts, incidents, recovery | 76 |
+| [Monitoring & Reliability](decks/foundations/monitoring-reliability.md) | Logs, metrics, traces, SLI/SLO/SLA, alerts, incidents, recovery, profiling | 86 |
 | [APIs & Web Fundamentals](decks/foundations/apis-web-fundamentals.md) | HTTP, JSON, status codes, REST, authentication, OAuth, webhooks, idempotency | 77 |
 | [Software Architecture & Distributed Systems](decks/foundations/software-architecture-distributed-systems.md) | Monoliths, services, queues, caching, scaling, retries, distributed state | 74 |
 | [Databases & Data Storage](decks/foundations/databases-data-storage.md) | SQL/NoSQL, joins, indexes, ACID, isolation, migrations, replication, backups | 80 |

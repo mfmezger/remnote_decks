@@ -96,3 +96,16 @@
 - What is a synthetic check? == An automated simulated user action run periodically to test a defined service path from a known location or environment.
 - Synthetic monitoring versus real-user monitoring? == Synthetic checks use controlled test traffic; real-user monitoring observes actual user experiences, which are broader but less controlled.
 - What is chaos engineering? == Controlled experiments that introduce failures to test resilience, with a clear hypothesis, limited impact, monitoring, and stop conditions.
+
+## Wall-Clock Time, CPU Time, and Profiling
+
+- What is wall-clock time? == The real elapsed time from a task's start to its finish, including all time spent waiting.
+- What is CPU time? == The time a processor actively spends executing a task's instructions; time spent waiting is not counted.
+- Which kinds of waiting count toward wall-clock time but not CPU time? == Sleeping, waiting for locks, and waiting for disk or network I/O.
+- Why is a single-threaded program's wall-clock time usually at least its CPU time? == It runs on at most one core at a time and additionally loses time to I/O waits and to other processes sharing the CPU.
+- How can a program's CPU time exceed its wall-clock time? == CPU time is summed across all cores, so a parallel program keeping 4 cores busy for 1 s uses about 4 s of CPU time.
+- What does CPU time far below wall-clock time indicate? == The task mostly waits on I/O, locks, or sleep, so making its code faster will barely reduce latency.
+- What does CPU time close to wall-clock time indicate for a single-threaded task? == The task is compute-bound, so faster code or parallelizing across cores will reduce latency.
+- CPU profiler versus wall-clock profiler? == A CPU profiler samples only code running on the CPU and finds compute hotspots; a wall-clock profiler also samples blocked and sleeping threads and finds where latency comes from.
+- What do real, user, and sys mean in the output of the Unix time command? == real is wall-clock time; user and sys are CPU time spent in user mode and in the kernel. user + sys above real means several cores worked in parallel.
+- Which Python functions measure wall-clock time and CPU time? == time.perf_counter() measures wall-clock time (including sleep); time.process_time() measures the process's CPU time (excluding sleep).
